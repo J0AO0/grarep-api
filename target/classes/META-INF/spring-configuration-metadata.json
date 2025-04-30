@@ -1,0 +1,23 @@
+{
+  "groups": [
+    {
+      "name": "unirad",
+      "type": "com.grarep.grarep.config.MeiApiProperty",
+      "sourceType": "com.grarep.grarep.config.MeiApiProperty"
+    },
+    {
+      "name": "unirad.seguranca",
+      "type": "com.grarep.grarep.config.MeiApiProperty$Seguranca",
+      "sourceType": "com.grarep.grarep.config.MeiApiProperty",
+      "sourceMethod": "getSeguranca()"
+    }
+  ],
+  "properties": [
+    {
+      "name": "unirad.origin-permitida",
+      "type": "java.lang.String",
+      "sourceType": "com.grarep.grarep.config.MeiApiProperty"
+    }
+  ],
+  "hints": []
+}

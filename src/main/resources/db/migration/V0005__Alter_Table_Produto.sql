@@ -1,0 +1,1 @@
+ALTER TABLE estoque MODIFY COLUMN produto VARCHAR(255);
