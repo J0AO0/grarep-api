@@ -24,15 +24,32 @@ public interface PedidoRepository extends JpaRepository<Pedido, Integer>, Pedido
             "p.nf, " +
             "p.arquiteto, " +
             "pp.quantidade, " +
-            "prod.nome AS nome_produto, " +
-            "prod.sku AS sku_produto, " +
+            "prod.nome AS nomeProduto, " +
+            "prod.sku AS skuProduto, " +
             "ls.datagravacao " +
             "FROM pedido p " +
             "LEFT JOIN produto_pedido pp ON p.id = pp.pedido_id " +
             "LEFT JOIN produto prod ON pp.produto_id = prod.id " +
             "LEFT JOIN log_sistema ls ON p.id = ls.pedido_id " +
-            "WHERE EXTRACT(MONTH FROM ls.datagravacao) = :mes " +
-            "AND EXTRACT(YEAR FROM ls.datagravacao) = :ano " +
+            "WHERE MONTH(ls.datagravacao) = :mes " +
+            "AND YEAR(ls.datagravacao) = :ano " +
             "ORDER BY p.representante, p.id, prod.nome", nativeQuery = true)
-    List<PedidoRelatorioDTO> findByAnoMesForRelatorio(@Param("ano") Integer ano, @Param("mes") Integer mes);
+    List<Object[]> findByAnoMesForRelatorioRaw(@Param("ano") Integer ano, @Param("mes") Integer mes);
+
+    @Query(value = "SELECT " +
+            "p.representante, " +
+            "p.id AS pedidoId, " +
+            "p.nf, " +
+            "p.arquiteto, " +
+            "pp.quantidade, " +
+            "prod.nome AS nomeProduto, " +
+            "prod.sku AS skuProduto, " +
+            "p.data_criacao AS datagravacao " +
+            "FROM pedido p " +
+            "LEFT JOIN produto_pedido pp ON p.id = pp.pedido_id " +
+            "LEFT JOIN produto prod ON pp.produto_id = prod.id " +
+            "WHERE MONTH(p.data_criacao) = :mes " +
+            "AND YEAR(p.data_criacao) = :ano " +
+            "ORDER BY p.representante, p.id, prod.nome", nativeQuery = true)
+    List<PedidoRelatorioDTO> findByAnoMesForRelatorioAlternative(@Param("ano") Integer ano, @Param("mes") Integer mes);
 }

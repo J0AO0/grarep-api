@@ -87,6 +87,7 @@ public class ClassePermissaoFlat {
             case "Produto": classePermissaoFlatProduto(objPorCategoria, permissoes); break;
             case "Pedido": classePermissaoFlatPedido(objPorCategoria, permissoes); break;
             case "Empresa": classePermissaoFlatEmpresa(objPorCategoria, permissoes); break;
+            case "Relatorio": classePermissaoFlatRelatorio(objPorCategoria, permissoes); break;
 
         }
 

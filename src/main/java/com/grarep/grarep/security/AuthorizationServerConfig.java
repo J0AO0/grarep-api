@@ -12,45 +12,47 @@ import org.springframework.security.oauth2.config.annotation.web.configuration.E
 import org.springframework.security.oauth2.config.annotation.web.configurers.AuthorizationServerEndpointsConfigurer;
 import org.springframework.security.oauth2.config.annotation.web.configurers.AuthorizationServerSecurityConfigurer;
 import org.springframework.security.oauth2.provider.token.TokenEnhancer;
+import org.springframework.security.oauth2.provider.token.TokenEnhancerChain;
 import org.springframework.security.oauth2.provider.token.TokenStore;
 import org.springframework.security.oauth2.provider.token.store.JwtAccessTokenConverter;
 import org.springframework.security.oauth2.provider.token.store.JwtTokenStore;
 import org.springframework.web.filter.CorsFilter;
 
+import java.util.Arrays;
+
 @Configuration
 @EnableAuthorizationServer
 public class AuthorizationServerConfig extends AuthorizationServerConfigurerAdapter {
+
 	@Autowired
 	private UserDetailsService userDetailsService;
+
 	@Autowired
 	private PasswordEncoder passwordEncoder;
+
 	@Autowired
 	private AuthenticationManager authenticationManager;
-	
+
 	@Autowired
 	private CorsFilter corsFilter;
 
 	@Override
 	public void configure(ClientDetailsServiceConfigurer clients) throws Exception {
 		clients
-			.inMemory()
-			.withClient("labsrep")
-			.secret(passwordEncoder.encode("#SERVER@labsrep"))
-			.scopes("read", "write")
-			.authorizedGrantTypes("password", "refresh_token")
-		    .accessTokenValiditySeconds(3600*24)
-			.refreshTokenValiditySeconds(60*60*24*30)
-
-			
-			
-        	.and()
-        	
-			.withClient("mobile")
-			.secret(passwordEncoder.encode("#SERVER@labsrep"))
-			.scopes("read")
-			.authorizedGrantTypes("password", "refresh_token")
-			.accessTokenValiditySeconds(1800)
-			.refreshTokenValiditySeconds(3600 * 24);
+				.inMemory()
+				.withClient("labsrep")
+				.secret(passwordEncoder.encode("#SERVER@labsrep"))
+				.scopes("read", "write")
+				.authorizedGrantTypes("password", "refresh_token")
+				.accessTokenValiditySeconds(3600 * 24) // 24 horas
+				.refreshTokenValiditySeconds(60 * 60 * 24 * 30) // 30 dias
+				.and()
+				.withClient("mobile")
+				.secret(passwordEncoder.encode("#SERVER@labsrep"))
+				.scopes("read")
+				.authorizedGrantTypes("password", "refresh_token")
+				.accessTokenValiditySeconds(1800) // 30 minutos
+				.refreshTokenValiditySeconds(3600 * 24); // 24 horas
 	}
 
 	@Bean
@@ -60,22 +62,9 @@ public class AuthorizationServerConfig extends AuthorizationServerConfigurerAdap
 		return accessTokenConverter;
 	}
 
-
 	@Bean
 	public TokenStore tokenStore() {
 		return new JwtTokenStore(accessTokenConverter());
-	}
-	
-	@Override
-	public void configure(AuthorizationServerSecurityConfigurer security) throws Exception {
-	security.addTokenEndpointAuthenticationFilter(this.corsFilter);
-	}
-
-	@Override
-	public void configure(AuthorizationServerEndpointsConfigurer endpoints) throws Exception {
-
-		endpoints.tokenStore(tokenStore()).accessTokenConverter(this.accessTokenConverter()).reuseRefreshTokens(false)
-				.userDetailsService(this.userDetailsService).authenticationManager(this.authenticationManager);
 	}
 
 	@Bean
@@ -83,4 +72,23 @@ public class AuthorizationServerConfig extends AuthorizationServerConfigurerAdap
 		return new CustomTokenEnhancer();
 	}
 
+	@Override
+	public void configure(AuthorizationServerSecurityConfigurer security) throws Exception {
+		security.addTokenEndpointAuthenticationFilter(this.corsFilter);
+	}
+
+	@Override
+	public void configure(AuthorizationServerEndpointsConfigurer endpoints) throws Exception {
+		// Configura a cadeia de enhancers
+		TokenEnhancerChain tokenEnhancerChain = new TokenEnhancerChain();
+		tokenEnhancerChain.setTokenEnhancers(Arrays.asList(tokenEnhancer(), accessTokenConverter()));
+
+		endpoints
+				.tokenStore(tokenStore())
+				.tokenEnhancer(tokenEnhancerChain) // Adiciona a cadeia de enhancers
+				.accessTokenConverter(accessTokenConverter())
+				.reuseRefreshTokens(false)
+				.userDetailsService(this.userDetailsService)
+				.authenticationManager(this.authenticationManager);
+	}
 }

@@ -1,8 +1,6 @@
 package com.grarep.grarep.domain.dto.rel;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.List;
 import java.sql.Timestamp;
 
 public class PedidoRelatorioDTO {
@@ -93,5 +91,19 @@ public class PedidoRelatorioDTO {
 
     public void setDataGravacao(Timestamp dataGravacao) {
         this.dataGravacao = dataGravacao;
+    }
+
+    @Override
+    public String toString() {
+        return "PedidoRelatorioDTO{" +
+                "representante='" + representante + '\'' +
+                ", pedidoId=" + pedidoId +
+                ", nf=" + nf +
+                ", arquiteto='" + arquiteto + '\'' +
+                ", quantidade=" + quantidade +
+                ", nomeProduto='" + nomeProduto + '\'' +
+                ", skuProduto='" + skuProduto + '\'' +
+                ", dataGravacao=" + dataGravacao +
+                '}';
     }
 }
